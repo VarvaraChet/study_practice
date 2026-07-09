@@ -18,6 +18,7 @@
 #include <QtCharts/QLineSeries>
 
 #include "../algorithm/algorithmState.h"
+#include "../algorithm/task.h"
 
 class QPushButton;
 class QTableWidget;
@@ -27,23 +28,31 @@ class ExecutionPage : public QWidget{
 
     public:
         explicit ExecutionPage(QWidget *parent=nullptr);
-        void updateState(const AlgorithmState &state);
+        void setTasks(const std::vector <Task>& t);
 
+    public slots:
+        void updateState(const AlgorithmState& state);
+        void showIndividual(const Individual& individ);
 
     signals:
         void nextStepRequested();
         void runRequested();
 
+        void individualSelected(int row);
+
 
     private:
         void addGeneration(int generation, double averageFitness, double bestFitness);
-        void updatePopulation(const std::vector <IndividualState>& population);
+        void updatePopulation(const std::vector <Individual>& population);
 
         QPushButton *m_nextButton;
         QPushButton *m_runButton;
 
         QTableWidget *m_generationTable;
         QTableWidget *m_populationTable;
+        QTableWidget *m_individualTable;
+
+        std::vector <Task> tasks;
 
         QChartView *m_chartView;
 

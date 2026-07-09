@@ -7,11 +7,17 @@ Settings::Settings(QWidget *parent) : QDialog(parent){
     auto *mainLayout = new QVBoxLayout(this);
     auto *form = new QFormLayout();
 
-    m_populationSize =new QSpinBox();
-    m_populationSize->setRange(2, 10000);
+    m_populationSize = new QSpinBox();
+    m_populationSize->setRange(2, 1000);
 
     m_generations = new QSpinBox();
-    m_generations->setRange(1, 100000);
+    m_generations->setRange(1, 10000);
+
+    m_tournament = new QSpinBox();
+    m_tournament->setRange(2, 10);
+
+    m_elite = new QSpinBox();
+    m_elite->setRange(1, 7);
 
     m_Pc = new QDoubleSpinBox();
     m_Pc->setRange(0.0, 1.0);
@@ -25,6 +31,8 @@ Settings::Settings(QWidget *parent) : QDialog(parent){
 
     form->addRow("Размер популяции:", m_populationSize);
     form->addRow("Количество поколений:", m_generations);
+    form->addRow("Размер турнира:", m_tournament);
+    form->addRow("Количество элиты:", m_elite);
     form->addRow("Вероятность скрещивания:", m_Pc);
     form->addRow("Вероятность мутации:", m_Pm);
 
@@ -51,6 +59,8 @@ Settings::Settings(QWidget *parent) : QDialog(parent){
 void Settings::setParameters(const Parameters& parameters){
     m_populationSize->setValue(parameters.populationSize);
     m_generations->setValue(parameters.generations);
+    m_tournament->setValue(parameters.tournamentSize);
+    m_elite->setValue(parameters.eliteSize);
     m_Pc->setValue(parameters.Pc);
     m_Pm->setValue(parameters.Pm);
 }
@@ -60,6 +70,8 @@ Parameters Settings::parameters() const{
 
     result.populationSize = m_populationSize->value();
     result.generations = m_generations->value();
+    result.tournamentSize = m_tournament->value();
+    result.eliteSize = m_elite->value();
     result.Pc = m_Pc->value();
     result.Pm = m_Pm->value();
 

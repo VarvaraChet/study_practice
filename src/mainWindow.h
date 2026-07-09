@@ -11,7 +11,9 @@
 #include "gui/fileInput.h"
 #include "gui/randomInput.h"
 #include "gui/executionPage.h"
+#include "gui/dataLoader.h"
 #include "gui/settings.h"
+#include "controller.h"
 
 class QStackedWidget;
 class StartPage;
@@ -35,6 +37,9 @@ class MainWindow : public QMainWindow{
 
         void openSettings();
 
+        void run(const std::vector<Task>& tasks);
+        void runFile(const QString& fileName);
+
     private:
         QStackedWidget *m_stack;
 
@@ -45,7 +50,9 @@ class MainWindow : public QMainWindow{
 
         ExecutionPage *m_executionPage;
 
-        Parameters m_parameters;
+        Controller *m_controller;
+
+        Parameters parameters;
 
         void createPages();
         void createConnections();

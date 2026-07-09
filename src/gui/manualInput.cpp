@@ -78,7 +78,6 @@ std::vector <Task> ManualInput::collectTasks(){
     for (int i=0; i < m_table->rowCount(); i++){
         Task task;
 
-        task.id = i+1;
         task.time = m_table ->item(i, 0) ->text().toInt();
         task.deadline = m_table->item(i,1)->text().toInt();
 

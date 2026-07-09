@@ -82,7 +82,6 @@ void RandomInput::generate(){
     for (int i=0; i < m_taskCount->value(); i++){
         Task task;
 
-        task.id = i+1;
         task.time = QRandomGenerator::global()->bounded(m_minTime->value(), m_maxTime->value()+1);
         task.deadline = QRandomGenerator::global()->bounded(m_minDeadline->value(), m_maxDeadline->value()+1);
 
