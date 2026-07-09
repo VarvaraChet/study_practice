@@ -8,7 +8,7 @@
 
 class DataLoader{
     public:
-        static std::vector <Task> load(const std::string& filename);
+        bool load(const std::string& filename, std::vector <Task>& tasks);
 };
 
 #endif

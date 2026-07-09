@@ -39,6 +39,8 @@ ExecutionPage::ExecutionPage(QWidget *parent) : QWidget(parent){
     m_populationTable->verticalHeader()->setVisible(false);
     m_populationTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    connect(m_populationTable, &QTableWidget::cellClicked, this, [this](int row,int){emit individualSelected(row);});
+
     QHBoxLayout *centerLayout = new QHBoxLayout;
 
     centerLayout->addWidget(m_generationTable, 1);
@@ -82,22 +84,58 @@ ExecutionPage::ExecutionPage(QWidget *parent) : QWidget(parent){
     m_chartView->setRenderHint(QPainter::Antialiasing);
     m_chartView->setMinimumHeight(300);
 
-    mainLayout->addWidget(m_chartView, 3);
+    m_individualTable = new QTableWidget;
+
+    m_individualTable->setColumnCount(4);
+    m_individualTable->setHorizontalHeaderLabels({"№", "Время", "Дедлайн", "Задержка"});
+
+    QHBoxLayout *bottomLayout = new QHBoxLayout;
+
+    bottomLayout->addWidget(m_chartView, 2);
+    bottomLayout->addWidget(m_individualTable, 1);
+
+    mainLayout->addLayout(bottomLayout, 3);
 
     connect(m_nextButton, &QPushButton::clicked, this, &ExecutionPage::nextStepRequested);
     connect(m_runButton, &QPushButton::clicked, this, &ExecutionPage::runRequested);
 }
 
+void ExecutionPage::showIndividual(const Individual& individ){
+    m_individualTable->setRowCount(individ.order.size());
+
+    int finish = 0;
+    for(int i=0; i < individ.order.size(); i++){
+        int id = individ.order[i];
+        finish += tasks[id].time;
+
+        int delay = std::max(0, finish-tasks[id].deadline);
+
+        m_individualTable->setItem(i, 0, new QTableWidgetItem(QString::number(id)));
+        m_individualTable->setItem(i, 1, new QTableWidgetItem(QString::number(tasks[id].time)));
+        m_individualTable->setItem(i, 2, new QTableWidgetItem(QString::number(tasks[id].deadline)));
+        m_individualTable->setItem(i, 3, new QTableWidgetItem(QString::number(delay)));
+    }
+}
+
+void ExecutionPage::setTasks(const std::vector<Task>& t){
+    tasks = t;
+}
+
 void ExecutionPage::updateState(const AlgorithmState &state){
     addGeneration(state.generation, state.averageFitness, state.bestFitness);
     updatePopulation(state.population);
+
+    if (m_populationTable->rowCount() > 0){
+        m_populationTable->selectRow(0);
+        emit individualSelected(0);
+    }
 }
 
-void ExecutionPage::updatePopulation(const std::vector <IndividualState>& population){
+void ExecutionPage::updatePopulation(const std::vector <Individual>& population){
     m_populationTable->setRowCount(static_cast<int>(population.size()));
 
     for (int i=0; i < static_cast<int>(population.size()); i++){
-        const IndividualState &individual = population[i];
+        const Individual &individual = population[i];
 
         m_populationTable->setItem(i, 1, new QTableWidgetItem(QString::number(individual.delay)));
 

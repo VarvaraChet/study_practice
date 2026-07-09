@@ -6,6 +6,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Расписание");
 
     createPages();
+
+    m_controller = new Controller(this);
+
     createConnections();
 
     setCentralWidget(m_stack);
@@ -36,18 +39,26 @@ void MainWindow::createConnections(){
 
     connect(m_manualPage, &ManualInput::backRequested, this, &MainWindow::showStartPage);
     connect(m_manualPage, &ManualInput::settingsRequested, this, &MainWindow::openSettings);
-    connect(m_manualPage, &ManualInput::startRequested, this, &MainWindow::showExecutionPage);
+    connect(m_manualPage, &ManualInput::startRequested, this, &MainWindow::run);
 
     connect(m_filePage, &FileInput::backRequested, this, &MainWindow::showStartPage);
     connect(m_filePage, &FileInput::settingsRequested, this, &MainWindow::openSettings);
-    connect(m_filePage, &FileInput::startRequested, this, &MainWindow::showExecutionPage);
+    connect(m_filePage, &FileInput::startRequested, this, &MainWindow::runFile);
+
+    connect(m_randomPage, &RandomInput::backRequested, this, &MainWindow::showStartPage);
+    connect(m_randomPage, &RandomInput::settingsRequested, this, &MainWindow::openSettings);
+    connect(m_randomPage, &RandomInput::startRequested, this, &MainWindow::run);
+
+    connect(m_controller, &Controller::stateChange, m_executionPage, &ExecutionPage::updateState);
+    connect(m_executionPage, &ExecutionPage::nextStepRequested, m_controller, &Controller::step);
+    connect(m_executionPage, &ExecutionPage::runRequested, m_controller, &Controller::fullExecute);
 
     connect(m_executionPage, &ExecutionPage::nextStepRequested, this, [](){});
     connect(m_executionPage, &ExecutionPage::runRequested, this, [](){});
 
-    connect(m_randomPage, &RandomInput::backRequested, this, &MainWindow::showStartPage);
-    connect(m_randomPage, &RandomInput::settingsRequested, this, &MainWindow::openSettings);
-    connect(m_randomPage, &RandomInput::startRequested, this, &MainWindow::showExecutionPage);
+    connect(m_executionPage, &ExecutionPage::individualSelected, m_controller, &Controller::showIndividual);
+    connect(m_controller, &Controller::individualReady, m_executionPage, &ExecutionPage::showIndividual);
+
 }
 
 void MainWindow::showStartPage(){
@@ -73,9 +84,30 @@ void MainWindow::showExecutionPage(){
 void MainWindow::openSettings(){
     Settings dialog(this);
 
-    dialog.setParameters(m_parameters);
+    dialog.setParameters(parameters);
 
     if (dialog.exec() == QDialog::Accepted)
-        m_parameters = dialog.parameters();
+        parameters = dialog.parameters();
 }
 
+void MainWindow::run(const std::vector<Task>& tasks){
+    m_executionPage->setTasks(tasks);
+    m_controller->run(tasks, parameters);
+
+    showExecutionPage();
+}
+
+void MainWindow::runFile(const QString &fileName){
+    DataLoader loader;
+
+    std::vector <Task> tasks;
+    if (!loader.load(fileName.toStdString(), tasks)){
+        QMessageBox::warning(this, "Ошибка", "Не удалось загрузить файл.");
+        return;
+    }
+
+    m_executionPage->setTasks(tasks);
+    m_controller->run(tasks, parameters);
+
+    showExecutionPage();
+}

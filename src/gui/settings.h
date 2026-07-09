@@ -28,6 +28,8 @@ class Settings : public QDialog{
     private:
         QSpinBox *m_populationSize;
         QSpinBox *m_generations;
+        QSpinBox *m_tournament;
+        QSpinBox *m_elite;
 
         QDoubleSpinBox *m_Pc;
         QDoubleSpinBox *m_Pm;

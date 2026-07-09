@@ -4,12 +4,13 @@
 #include <sstream>
 #include <stdexcept>
 
-std::vector <Task> DataLoader::load(const std::string& filename){
-    std::vector <Task> tasks;
+bool DataLoader::load(const std::string& filename, std::vector <Task>& tasks){
     std::ifstream file(filename);
 
-    if (!file.is_open())
+    if (!file.is_open()){
         throw std::runtime_error("Не удалось открыть файл");
+        return false;
+    }
 
     std::string line;
     int id=1;
@@ -25,16 +26,17 @@ std::vector <Task> DataLoader::load(const std::string& filename){
 
         ss >> time >> deadline;
 
-        if (ss.fail())
+        if (ss.fail()){
             throw std::runtime_error("Ошибка чтения строки файла");
+            return false;
+        }
 
         Task task;
-        task.id = id++;
         task.time = time;
         task.deadline = deadline;
 
         tasks.push_back(task);
     }
 
-    return tasks;
+    return true;
 }

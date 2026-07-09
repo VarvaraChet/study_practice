@@ -2,19 +2,20 @@
 #define ALGORITHM_STATE_H
 
 #include <vector>
+#include <climits>
 
-struct IndividualState{
-    int delay;
+struct Individual{
+    int delay=0;
     std::vector <int> order;
 };
 
 struct AlgorithmState{
     int generation = 0;
 
-    double bestFitness = 0;
+    int bestFitness = INT_MAX;
     double averageFitness = 0;
 
-    std::vector <IndividualState> population;
+    std::vector <Individual> population;
 };
 
 #endif
