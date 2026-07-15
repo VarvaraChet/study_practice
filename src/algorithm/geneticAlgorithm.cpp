@@ -48,7 +48,21 @@ void GeneticAlgorithm::calcСharacteristic(){
     state.averageFitness = sum/params.populationSize;
 }
 
+bool cmp(Individual a, Individual b){
+    return a.delay < b.delay;
+}
+
 void GeneticAlgorithm::run(const std::vector <Task>& t, Parameters& p){
+    state.population.clear();
+    state.population.shrink_to_fit();
+
+    new_population.clear();
+    new_population.shrink_to_fit();
+
+    state.generation = 0;
+    state.bestFitness = 0;
+    state.averageFitness = 0;
+
     cnt_tasks = t.size();
     tasks = t;
     params = p;
@@ -57,6 +71,7 @@ void GeneticAlgorithm::run(const std::vector <Task>& t, Parameters& p){
         state.population.push_back(createIndividual());
 
     calcСharacteristic();
+    std::sort(state.population.begin(), state.population.end(), cmp);
 }
 
 void GeneticAlgorithm::fillOutChild(Individual& parent, Individual& child, int x){
@@ -128,13 +143,7 @@ int GeneticAlgorithm::tournament(){
     return best;
 }
 
-bool cmp(Individual a, Individual b){
-    return a.delay < b.delay;
-}
-
 void GeneticAlgorithm::step(){
-    std::sort(state.population.begin(), state.population.end(), cmp);
-
     int elite=std::min(params.populationSize/2, params.eliteSize);
     elite += (params.populationSize-elite)%2;
 
@@ -165,4 +174,6 @@ void GeneticAlgorithm::step(){
 
     calcСharacteristic();
     state.generation++;
+
+    std::sort(state.population.begin(), state.population.end(), cmp);
 }

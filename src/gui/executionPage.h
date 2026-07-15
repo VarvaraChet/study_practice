@@ -17,6 +17,8 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 
+#include <limits>
+
 #include "../algorithm/algorithmState.h"
 #include "../algorithm/task.h"
 
@@ -30,6 +32,8 @@ class ExecutionPage : public QWidget{
         explicit ExecutionPage(QWidget *parent=nullptr);
         void setTasks(const std::vector <Task>& t);
 
+        void reset();
+
     public slots:
         void updateState(const AlgorithmState& state);
         void showIndividual(const Individual& individ);
@@ -37,6 +41,8 @@ class ExecutionPage : public QWidget{
     signals:
         void nextStepRequested();
         void runRequested();
+        void restartRequested();
+        void newRunRequested();
 
         void individualSelected(int row);
 
@@ -47,6 +53,8 @@ class ExecutionPage : public QWidget{
 
         QPushButton *m_nextButton;
         QPushButton *m_runButton;
+        QPushButton *m_restartButton;
+        QPushButton *m_newRunButton;
 
         QTableWidget *m_generationTable;
         QTableWidget *m_populationTable;
