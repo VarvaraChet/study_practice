@@ -55,6 +55,8 @@ void MainWindow::createConnections(){
 
     connect(m_executionPage, &ExecutionPage::nextStepRequested, this, [](){});
     connect(m_executionPage, &ExecutionPage::runRequested, this, [](){});
+    connect(m_executionPage, &ExecutionPage::restartRequested, this, &MainWindow::restart);
+    connect(m_executionPage, &ExecutionPage::newRunRequested, this, &MainWindow::newRun);
 
     connect(m_executionPage, &ExecutionPage::individualSelected, m_controller, &Controller::showIndividual);
     connect(m_controller, &Controller::individualReady, m_executionPage, &ExecutionPage::showIndividual);
@@ -91,23 +93,36 @@ void MainWindow::openSettings(){
 }
 
 void MainWindow::run(const std::vector<Task>& tasks){
+    currentTasks = tasks;
+
     m_executionPage->setTasks(tasks);
     m_controller->run(tasks, parameters);
 
     showExecutionPage();
 }
 
+void MainWindow::restart(){
+    m_executionPage->reset();
+
+    m_controller->run(currentTasks, parameters);
+}
+
+void MainWindow::newRun(){
+    m_executionPage->reset();
+
+    m_stack->setCurrentWidget(m_startPage);
+}
+
 void MainWindow::runFile(const QString &fileName){
     DataLoader loader;
 
-    std::vector <Task> tasks;
-    if (!loader.load(fileName.toStdString(), tasks)){
+    if (!loader.load(fileName.toStdString(), currentTasks)){
         QMessageBox::warning(this, "Ошибка", "Не удалось загрузить файл.");
         return;
     }
 
-    m_executionPage->setTasks(tasks);
-    m_controller->run(tasks, parameters);
+    m_executionPage->setTasks(currentTasks);
+    m_controller->run(currentTasks, parameters);
 
     showExecutionPage();
 }

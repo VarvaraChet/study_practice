@@ -12,9 +12,13 @@ ExecutionPage::ExecutionPage(QWidget *parent) : QWidget(parent){
 
     m_nextButton = new QPushButton("Следующий шаг");
     m_runButton = new QPushButton("Выполнить полностью");
+    m_restartButton = new QPushButton("Рестарт");
+    m_newRunButton = new QPushButton("Новый запуск");
 
     buttonLayout->addWidget(m_nextButton);
     buttonLayout->addWidget(m_runButton);
+    buttonLayout->addWidget(m_restartButton);
+    buttonLayout->addWidget(m_newRunButton);
     buttonLayout->addStretch();
 
     mainLayout->addLayout(buttonLayout);
@@ -98,6 +102,8 @@ ExecutionPage::ExecutionPage(QWidget *parent) : QWidget(parent){
 
     connect(m_nextButton, &QPushButton::clicked, this, &ExecutionPage::nextStepRequested);
     connect(m_runButton, &QPushButton::clicked, this, &ExecutionPage::runRequested);
+    connect(m_restartButton, &QPushButton::clicked, this, &ExecutionPage::restartRequested);
+    connect(m_newRunButton, &QPushButton::clicked, this, &ExecutionPage::newRunRequested);
 }
 
 void ExecutionPage::showIndividual(const Individual& individ){
@@ -119,6 +125,18 @@ void ExecutionPage::showIndividual(const Individual& individ){
 
 void ExecutionPage::setTasks(const std::vector<Task>& t){
     tasks = t;
+}
+
+void ExecutionPage::reset(){
+    m_generationTable->setRowCount(0);
+    m_populationTable->setRowCount(0);
+    m_individualTable->setRowCount(0);
+
+    m_averageSeries->clear();
+    m_bestSeries->clear();
+
+    m_minFitness = std::numeric_limits<double>::max();
+    m_maxFitness = std::numeric_limits<double>::lowest();
 }
 
 void ExecutionPage::updateState(const AlgorithmState &state){

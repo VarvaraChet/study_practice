@@ -40,6 +40,9 @@ class MainWindow : public QMainWindow{
         void run(const std::vector<Task>& tasks);
         void runFile(const QString& fileName);
 
+        void restart();
+        void newRun();
+
     private:
         QStackedWidget *m_stack;
 
@@ -53,6 +56,7 @@ class MainWindow : public QMainWindow{
         Controller *m_controller;
 
         Parameters parameters;
+        std::vector <Task> currentTasks;
 
         void createPages();
         void createConnections();
